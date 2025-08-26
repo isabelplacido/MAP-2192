@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Emoji Dog Runner</title>
+<style>
+  :root { --w: 720px; --h: 260px; --ground: 210px; --speed: 4; }
+  * { box-sizing: border-box; }
+  body { margin: 0; display: grid; place-items: center; min-height: 100dvh; background:#0b1020; color:#e5e7eb; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { width: min(95vw,var(--w)); }
+  #game { position: relative; width: 100%; height: var(--h); background: linear-gradient(#0b1020, #111a33); overflow: hidden; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+  #ground { position:absolute; left:0; right:0; top: var(--ground); height: 4px; background:#2a335a; box-shadow: 0 2px 0 #0b1020 inset; }
+  .ent { position:absolute; font-size: 40px; line-height: 1; user-select:none; }
+  #dog { bottom: calc(100% - var(--ground) + 2px); left: 32px; transform-origin: center bottom; }
+  .cactus { bottom: calc(100% - var(--ground)); }
+  .cloud { top: 24px; opacity: .6; font-size: 28px; }
+  .hud { display:flex; justify-content:space-between; gap: 8px; padding: 8px 4px 0 8px; font-weight: 600; font-feature-settings:"tnum" on, "ss01" on; }
+  .btnrow { display:flex; gap:8px; margin-top:8px; }
+  button { background:#1d2750; color:#e5e7eb; border:1px solid #33417a; padding:8px 12px; border-radius:10px; cursor:pointer; }
+  button:hover { filter:brightness(1.1); }
+  .flash { animation: flash .15s step-end 3; }
+  @keyframes flash { 50% { filter: invert(100%); } }
+  .hint { opacity:.75; font-size: 12px; margin-top: 6px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hud">
+      <div>🐶 Emoji Dog Runner</div>
+      <div>Score: <span id="score">0</span> • Best: <span id="best">0</span></div>
+    </div>
+    <div id="game" tabindex="0" aria-label="Emoji Dog Runner game. Press Space or click/tap to jump.">
+      <div id="ground"></div>
+      <div id="dog" class="ent" role="img" aria-label="dog">🐶</div>
+    </div>
+    <div class="btnrow">
+      <button id="restart">Restart</button>
+      <button id="slower">◀︎ Slower</button>
+      <button id="faster">Faster ▶︎</button>
+    </div>
+    <div class="hint">Space / Click / Tap = jump • Avoid 🌵/🪵 • Speed adjusts difficulty</div>
+  </div>
+<script>
+(() => {
+  const game = document.getElementById('game');
+  const dogEl = document.getElementById('dog');
+  const scoreEl = document.getElementById('score');
+  const bestEl = document.getElementById('best');
+  const restartBtn = document.getElementById('restart');
+  const slowerBtn = document.getElementById('slower');
+  const fasterBtn = document.getElementById('faster');
+
+  // State
+  const state = { x: 32, y: 0, vy: 0, onGround: true, t: 0, running: true, score: 0, best: +(localStorage.getItem('dogrunner-best')||0), speed: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--speed')) || 4 };
+  bestEl.textContent = state.best;
+
+  const rect = () => game.getBoundingClientRect();
+  const GROUND_Y = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ground'));
+
+  // Helpers
+  const mk = (cls, emoji) => { const e = document.createElement('div'); e.className = `ent ${cls}`; e.textContent = emoji; game.appendChild(e); return e; };
+  const worldW = () => rect().width;
+
+  const ents = new Set();
+  let spawnTimer = 0, cloudTimer = 0;
+
+  function reset() {
+    state.x = 32; state.y = 0; state.vy = 0; state.onGround = true; state.t = 0; state.running = true; state.score = 0;
+    dogEl.style.bottom = (rect().height - GROUND_Y() - 40 + state.y) + 'px';
+    // remove ents
+    ents.forEach(e => e.remove()); ents.clear();
+    spawnTimer = 0; cloudTimer = 0;
+    dogEl.textContent = '🐶';
+    scoreEl.textContent = '0';
+    game.classList.remove('flash');
+  }
+
+  function jump() {
+    if (!state.running) { reset(); return; }
+    if (state.onGround) { state.vy = 11; state.onGround = false; }
+  }
+
+  function collide(a, b) {
+    const ar = a.getBoundingClientRect(); const br = b.getBoundingClientRect();
+    return !(ar.right < br.left + 6 || ar.left > br.right - 6 || ar.bottom < br.top + 6 || ar.top > br.bottom - 6);
+  }
+
+  function tick(dt) {
+    if (!state.running) return;
+    state.t += dt; state.score += dt * 10; scoreEl.textContent = Math.floor(state.score);
+
+    // Gravity/physics
+    state.vy += -24 * dt; // gravity
+    state.y += state.vy;
+    if (state.y <= 0) { state.y = 0; state.vy = 0; state.onGround = true; }
+
+    // Animate dog (ears up while in air)
+    dogEl.textContent = state.onGround ? (Math.floor(state.t*10)%2? '🐕' : '🐶') : '🐕‍🦺';
+    dogEl.style.bottom = (rect().height - GROUND_Y() - 40 + state.y) + 'px';
+
+    // Spawn obstacles
+    spawnTimer -= dt; if (spawnTimer <= 0) {
+      const emoji = Math.random() < 0.5 ? '🌵' : '🪵';
+      const e = mk('cactus', emoji);
+      e.style.left = (worldW() + 20) + 'px';
+      ents.add(e);
+      const base = Math.max(0.6, 1.8 - state.speed*0.18);
+      spawnTimer = base + Math.random()*0.8;
+    }
+
+    // Spawn clouds
+    cloudTimer -= dt; if (cloudTimer <= 0) {
+      const c = mk('cloud', '☁️');
+      c.style.left = (worldW() + 20) + 'px';
+      c.style.top = (12 + Math.random()*40) + 'px';
+      ents.add(c);
+      cloudTimer = 1.4 + Math.random()*1.4;
+    }
+
+    // Move & cleanup
+    ents.forEach(e => {
+      const x = (parseFloat(e.style.left||'0') - (state.speed * (e.classList.contains('cloud')? 20: 120)) * dt);
+      e.style.left = x + 'px';
+      if (x < -60) { e.remove(); ents.delete(e); }
+      if (state.running && !e.classList.contains('cloud') && collide(dogEl,e)) {
+        state.running = false; dogEl.textContent = '💥🐶'; game.classList.add('flash');
+        state.best = Math.max(state.best, Math.floor(state.score));
+        localStorage.setItem('dogrunner-best', state.best);
+        bestEl.textContent = state.best;
+      }
+    });
+  }
+
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    tick(dt);
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  // Input
+  game.addEventListener('pointerdown', jump);
+  window.addEventListener('keydown', (e) => { if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); jump(); } });
+  restartBtn.addEventListener('click', reset);
+  slowerBtn.addEventListener('click', () => { state.speed = Math.max(1, state.speed - 1); updateSpeed(); });
+  fasterBtn.addEventListener('click', () => { state.speed = Math.min(12, state.speed + 1); updateSpeed(); });
+
+  function updateSpeed(){ document.documentElement.style.setProperty('--speed', state.speed); slowerBtn.textContent = `◀︎ Slower (${state.speed-1|0})`; fasterBtn.textContent = `Faster ▶︎ (${state.speed+1|0})`; }
+  updateSpeed();
+
+  // Kick off
+  reset();
+})();
+</script>
+</body>
+</html>
