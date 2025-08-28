@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GeoQuest — World Geography Flashcards</title>
+  <title>US GeoQuest — U.S. Geography Flashcards</title>
   <style>
     :root{
       --bg:#0b1020; --panel:#0f162c; --text:#e5e7eb; --muted:#94a3b8; --ok:#16a34a; --bad:#ef4444; --accent:#60a5fa;
@@ -43,7 +43,7 @@
 <body>
   <div class="app">
     <header>
-      <h1>🌍 GeoQuest — World Geography</h1>
+      <h1>🗺️ US GeoQuest — U.S. Geography</h1>
       <div class="chips">
         <span class="chip">Score: <b id="score">0</b></span>
         <span class="chip">Q <b id="qnum">1</b>/<b id="qtotal">10</b></span>
@@ -78,21 +78,26 @@
 
     // --- World geography deck ---
     const deck = [
-      {q:'Capital of 🇫🇷 France', a:'Paris', d:['Lyon','Marseille','Nice']},
-      {q:'Country with the most time zones', a:'France', d:['Russia','USA','China']},
-      {q:'Largest desert on Earth (by area)', a:'Antarctic Desert', d:['Sahara','Gobi','Arabian']},
-      {q:'River that flows through 🇪🇬 Cairo', a:'Nile', d:['Tigris','Euphrates','Jordan']},
-      {q:'Mount Kilimanjaro is in', a:'Tanzania', d:['Kenya','Uganda','Ethiopia']},
-      {q:'🇧🇷 Brazil’s primary language', a:'Portuguese', d:['Spanish','French','English']},
-      {q:'Continent with the most countries', a:'Africa', d:['Asia','Europe','South America']},
-      {q:'Capital of 🇯🇵 Japan', a:'Tokyo', d:['Kyoto','Osaka','Nagoya']},
-      {q:'Sea between Europe and Africa', a:'Mediterranean Sea', d:['Black Sea','Red Sea','Caspian Sea']},
-      {q:'Country landlocked in South Africa', a:'Lesotho', d:['Eswatini','Botswana','Namibia']},
-      {q:'Parthenon city', a:'Athens', d:['Rome','Istanbul','Thessaloniki']},
-      {q:'Country with capital 🇦🇺 Canberra', a:'Australia', d:['Austria','New Zealand','Fiji']},
-      {q:'Lake shared by 🇨🇦🇺🇸 at Niagara Falls', a:'Lake Erie', d:['Lake Ontario','Lake Huron','Lake Superior']},
-      {q:'Land of the Rising Sun', a:'Japan', d:['South Korea','China','Thailand']},
-      {q:'Capital of 🇪🇬 Egypt', a:'Cairo', d:['Alexandria','Giza','Luxor']}
+      {q:'U.S. capital city', a:'Washington, D.C.', d:['New York City','Philadelphia','Boston']},
+      {q:'Largest U.S. state by area', a:'Alaska', d:['Texas','California','Montana']},
+      {q:'Most populous U.S. state', a:'California', d:['Texas','Florida','New York']},
+      {q:'River that flows through New Orleans', a:'Mississippi River', d:['Missouri River','Ohio River','Colorado River']},
+      {q:'Grand Canyon state', a:'Arizona', d:['Utah','Nevada','New Mexico']},
+      {q:'State nicknamed the Sunshine State', a:'Florida', d:['California','Arizona','Hawaii']},
+      {q:'Mount Denali is in', a:'Alaska', d:['Colorado','Washington','Wyoming']},
+      {q:'Great Lakes state shaped like a mitten', a:'Michigan', d:['Wisconsin','Minnesota','Illinois']},
+      {q:'U.S. state with the most time zones (including territories)', a:'Alaska', d:['Florida','Texas','Hawaii']},
+      {q:'Capital of Texas', a:'Austin', d:['Houston','Dallas','San Antonio']},
+      {q:'The Gateway Arch is in', a:'St. Louis, Missouri', d:['Kansas City, Missouri','Omaha, Nebraska','Memphis, Tennessee']},
+      {q:'State that borders only one other U.S. state', a:'Maine', d:['Florida','Washington','Alaska']},
+      {q:'U.S. state closest to Russia', a:'Alaska', d:['Washington','Hawaii','California']},
+      {q:'City known as the Windy City', a:'Chicago', d:['Detroit','Cleveland','Milwaukee']},
+      {q:'River that forms much of the border between Texas and Mexico', a:'Rio Grande', d:['Colorado River','Arkansas River','Brazos River']},
+      {q:'Tallest mountain in the contiguous U.S.', a:'Mount Whitney', d:['Mount Elbert','Mount Rainier','Pikes Peak']},
+      {q:'State with the most active volcanoes (lower 48)', a:'Washington', d:['California','Oregon','Idaho']},
+      {q:'Capital of New York state', a:'Albany', d:['New York City','Buffalo','Syracuse']},
+      {q:'Which Great Lake is entirely within the U.S.?', a:'Lake Michigan', d:['Lake Erie','Lake Ontario','Lake Huron']},
+      {q:'National park home to Old Faithful geyser', a:'Yellowstone', d:['Yosemite','Grand Teton','Glacier']}
     ];
 
     // shuffle & pick first 10
