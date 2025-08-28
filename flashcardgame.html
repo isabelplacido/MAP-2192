@@ -1,376 +1,171 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Flashcard Quest — Study Game</title>
-<style>
-  :root{
-    --bg:#0b1020; --panel:#121a33; --accent:#60a5fa; --text:#e5e7eb; --good:#22c55e; --bad:#ef4444; --muted:#9aa3b2;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;min-height:100dvh;display:grid;place-items:center;background:linear-gradient(180deg,#070b16,#0b1020 50%,#0f1833);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-  .app{width:min(980px,96vw);margin:18px;padding:18px;border-radius:18px;background:var(--panel);box-shadow:0 12px 40px rgba(0,0,0,.35)}
-  header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
-  h1{margin:0;font-size:20px;letter-spacing:.3px}
-  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  select, input, button, textarea{background:#0f162c;border:1px solid #23305d;color:var(--text);border-radius:10px;padding:8px 10px;font-size:14px}
-  button{cursor:pointer}
-  button.primary{background:var(--accent);border-color:#5b9cfa;color:#071225;font-weight:700}
-  button.ghost{background:transparent}
-  button:disabled{opacity:.5;cursor:not-allowed}
-  .stats{display:flex;gap:14px;align-items:center;font-weight:600}
-  .chip{padding:4px 10px;border-radius:999px;background:#0c142b;border:1px solid #23305d;color:#cbd5e1}
-  .chip.good{border-color:#1c8d45;color:#b7f7c9}
-  .chip.bad{border-color:#b43a3a;color:#fecaca}
-  .chip.warn{border-color:#6b7280;color:#e5e7eb}
-  .board{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
-  @media (max-width:860px){.board{grid-template-columns:1fr}}
-  .card{position:relative;min-height:210px;border-radius:16px;background:#0f162c;border:1px solid #23305d;padding:18px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
-  .q{font-size:26px;line-height:1.2}
-  .a{margin-top:8px;font-size:18px;opacity:.8}
-  .meta{position:absolute;inset:10px auto auto 10px;font-size:12px;color:var(--muted)}
-  .progress{position:absolute;left:0;right:0;bottom:0;height:6px;background:#0a1226;border-radius:0 0 16px 16px;overflow:hidden}
-  .progress>span{display:block;height:100%;width:0;background:linear-gradient(90deg,#60a5fa,#34d399)}
-  .mc{display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px;width:min(520px,92%)}
-  .opt{padding:10px 12px;border-radius:12px;border:1px solid #23305d;background:#0b1328;text-align:left}
-  .opt.correct{border-color:#1c8d45;background:#0b1f16}
-  .opt.wrong{border-color:#8a2323;background:#1a0f12}
-  .judge{display:flex;gap:8px;margin-top:10px}
-  .judge>button{flex:1}
-  .right{color:var(--good)}
-  .wrong{color:var(--bad)}
-  .blink{animation: blink .25s step-end 4}
-  @keyframes blink{50%{filter:invert(1)}}
-  aside{border-radius:16px;background:#0f162c;border:1px solid #23305d;padding:14px}
-  details{margin-bottom:10px}
-  details>summary{cursor:pointer;font-weight:700}
-  textarea{width:100%;height:120px}
-  .mini{font-size:12px;color:var(--muted)}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .grid label{font-size:12px;color:#bdc7d8}
-  .legend{font-size:12px;opacity:.8;margin-top:6px}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GeoQuest — World Geography Flashcards</title>
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#0f162c; --text:#e5e7eb; --muted:#94a3b8; --ok:#16a34a; --bad:#ef4444; --accent:#60a5fa;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100dvh;display:grid;place-items:center;background:linear-gradient(180deg,#070b16,#0b1020 50%,#0f1833);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .app{width:min(860px,96vw);margin:18px;padding:18px;border-radius:18px;background:var(--panel);box-shadow:0 12px 40px rgba(0,0,0,.35)}
+    header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
+    h1{margin:0;font-size:20px;letter-spacing:.3px}
+    .chip{padding:6px 10px;border-radius:999px;background:#0c142b;border:1px solid #23305d;color:#cbd5e1;font-weight:600}
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+
+    .card{position:relative;border-radius:16px;border:1px solid #23305d;background:#0b1328;padding:18px;text-align:center}
+    .q{font-size:24px;line-height:1.25;margin:4px auto 12px auto;max-width:60ch}
+    .opts{display:grid;grid-template-columns:1fr;gap:10px;margin:0 auto;max-width:560px}
+    .opt{padding:12px 14px;border-radius:12px;border:1px solid #2b3a6b;background:#0f162c;color:var(--text);text-align:left;cursor:pointer;font-size:16px}
+    .opt:hover{filter:brightness(1.1)}
+    .opt[disabled]{opacity:.7;cursor:not-allowed}
+    .opt.correct{border-color:#1c8d45;background:#0a1e14}
+    .opt.wrong{border-color:#8a2323;background:#1a0f12}
+
+    .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+    button{padding:10px 14px;border-radius:10px;border:1px solid #33417a;background:#13214a;color:var(--text);cursor:pointer;font-weight:600}
+    button.primary{background:var(--accent);border-color:#5b9cfa;color:#061225}
+    button:disabled{opacity:.55;cursor:not-allowed}
+
+    .feedback{min-height:28px;margin-top:6px;font-weight:700}
+    .good{color:var(--ok)}
+    .bad{color:var(--bad)}
+
+    .progress{height:8px;background:#0a1226;border:1px solid #23305d;border-radius:999px;overflow:hidden;margin-top:14px}
+    .bar{height:100%;width:0;background:linear-gradient(90deg,#60a5fa,#34d399)}
+
+    @media (min-width:720px){ .opts{grid-template-columns:1fr 1fr} }
+  </style>
 </head>
 <body>
-<div class="app" id="app">
-  <header>
-    <h1>📚 Flashcard Quest <span class="mini">— learn fast, level up</span></h1>
-    <div class="row">
-      <select id="deckPick" title="Choose deck"></select>
-      <button id="addCardBtn" class="ghost">➕ Add</button>
-      <button id="importBtn" class="ghost">⬆️ Import</button>
-      <button id="exportBtn" class="ghost">⬇️ Export</button>
-      <button id="resetStatsBtn" class="ghost">🗑 Stats</button>
-      <button id="helpBtn" class="ghost">❓ Help</button>
-    </div>
-  </header>
-
-  <div class="stats">
-    <span class="chip">Level <span id="level">1</span></span>
-    <span class="chip">XP <span id="xp">0</span>/<span id="xpNeed">50</span></span>
-    <span class="chip good">Streak <span id="streak">0</span></span>
-    <span class="chip bad">Lives <span id="lives">3</span> ❤️</span>
-    <span class="chip warn">Due <span id="due">0</span></span>
-  </div>
-
-  <div class="board">
-    <section class="card" id="card">
-      <div class="meta" id="meta">Press 1‑4 to answer • Enter to flip/next</div>
-      <div class="q" id="q">Loading…</div>
-      <div class="a" id="a" hidden>—</div>
-      <div class="mc" id="mc"></div>
-      <div class="judge" id="judge" hidden>
-        <button id="gotIt" class="primary">✔️ I knew it</button>
-        <button id="oops">✖️ Missed it</button>
+  <div class="app">
+    <header>
+      <h1>🌍 GeoQuest — World Geography</h1>
+      <div class="chips">
+        <span class="chip">Score: <b id="score">0</b></span>
+        <span class="chip">Q <b id="qnum">1</b>/<b id="qtotal">10</b></span>
+        <span class="chip">Streak: <b id="streak">0</b></span>
       </div>
-      <div class="progress"><span id="pbar"></span></div>
+    </header>
+
+    <section class="card" id="card">
+      <div class="q" id="q">Loading…</div>
+      <div class="opts" id="opts"></div>
+      <div class="feedback" id="fb"></div>
+      <div class="row">
+        <button id="next" class="primary" disabled>Next ▶︎</button>
+        <button id="restart">Restart ⟲</button>
+      </div>
+      <div class="progress"><div class="bar" id="bar"></div></div>
     </section>
-
-    <aside>
-      <details open>
-        <summary>Game Modes</summary>
-        <div class="grid">
-          <label><input type="radio" name="mode" value="mc" checked> Multiple‑choice</label>
-          <label><input type="radio" name="mode" value="type"> Type‑answer</label>
-        </div>
-        <div id="typeBox" class="row" hidden>
-          <input id="typeInput" placeholder="Type your answer…" style="flex:1"/>
-          <button id="submitType" class="primary">Submit</button>
-        </div>
-        <div class="legend">Hotkeys: 1‑4, Enter, Space. Edit deck via ➕ or Import.</div>
-      </details>
-
-      <details>
-        <summary>➕ Add Card</summary>
-        <div class="grid">
-          <div>
-            <label>Front</label>
-            <input id="frontIn" placeholder="e.g., Capital of France?" />
-          </div>
-          <div>
-            <label>Back</label>
-            <input id="backIn" placeholder="Paris" />
-          </div>
-        </div>
-        <div class="row" style="margin-top:8px">
-          <button id="addBtn" class="primary">Add to deck</button>
-          <span class="mini">Current deck: <b id="deckNameMini"></b></span>
-        </div>
-      </details>
-
-      <details>
-        <summary>⬆️ Import / ⬇️ Export</summary>
-        <p class="mini">CSV (front,back per line) or JSON array of {front,back}.</p>
-        <textarea id="importBox" placeholder="front,back\n2+2,4\n…"></textarea>
-        <div class="row">
-          <button id="doImport" class="primary">Import to deck</button>
-          <button id="downloadBtn">Download JSON</button>
-        </div>
-      </details>
-
-      <details>
-        <summary>About</summary>
-        <p class="mini">Weighted practice favors unseen/wrong cards. Correct = XP & streak; wrong = lose life and card resurfaces sooner. LocalStorage saves decks + stats.</p>
-      </details>
-    </aside>
   </div>
-</div>
 
-<script>
-(() => {
-  const el = id => document.getElementById(id);
-  const deckPick = el('deckPick');
-  const qEl = el('q'), aEl = el('a'), mcEl = el('mc');
-  const judge = el('judge'), gotIt = el('gotIt'), oops = el('oops');
-  const pbar = el('pbar');
-  const levelEl = el('level'), xpEl = el('xp'), xpNeedEl = el('xpNeed');
-  const streakEl = el('streak'), livesEl = el('lives'), dueEl = el('due');
-  const typeBox = el('typeBox'), typeInput = el('typeInput'), submitType = el('submitType');
-  const frontIn = el('frontIn'), backIn = el('backIn'), addBtn = el('addBtn');
-  const deckNameMini = el('deckNameMini');
-  const importBox = el('importBox'), doImport = el('doImport'), downloadBtn = el('downloadBtn');
-  const addCardBtn = el('addCardBtn'), importBtn = el('importBtn'), exportBtn = el('exportBtn');
-  const resetStatsBtn = el('resetStatsBtn'), helpBtn = el('helpBtn');
+  <script>
+  (function(){
+    const qEl = document.getElementById('q');
+    const optsEl = document.getElementById('opts');
+    const fbEl = document.getElementById('fb');
+    const scoreEl = document.getElementById('score');
+    const qnumEl = document.getElementById('qnum');
+    const qtotalEl = document.getElementById('qtotal');
+    const streakEl = document.getElementById('streak');
+    const nextBtn = document.getElementById('next');
+    const restartBtn = document.getElementById('restart');
+    const bar = document.getElementById('bar');
 
-  // ---- Data ----
-  const LS = 'flashquest-v1';
-  const sample = {
-    name: 'Sample — Capitals',
-    cards: [
-      {front:'Capital of France', back:'Paris'},
-      {front:'Capital of Japan', back:'Tokyo'},
-      {front:'H2O is called…', back:'Water'},
-      {front:'3×3', back:'9'},
-      {front:'Largest ocean', back:'Pacific'},
-      {front:'Binary of 2', back:'10'},
-      {front:'Python list length fn', back:'len'},
-    ]
-  };
+    // --- World geography deck ---
+    const deck = [
+      {q:'Capital of 🇫🇷 France', a:'Paris', d:['Lyon','Marseille','Nice']},
+      {q:'Country with the most time zones', a:'France', d:['Russia','USA','China']},
+      {q:'Largest desert on Earth (by area)', a:'Antarctic Desert', d:['Sahara','Gobi','Arabian']},
+      {q:'River that flows through 🇪🇬 Cairo', a:'Nile', d:['Tigris','Euphrates','Jordan']},
+      {q:'Mount Kilimanjaro is in', a:'Tanzania', d:['Kenya','Uganda','Ethiopia']},
+      {q:'🇧🇷 Brazil’s primary language', a:'Portuguese', d:['Spanish','French','English']},
+      {q:'Continent with the most countries', a:'Africa', d:['Asia','Europe','South America']},
+      {q:'Capital of 🇯🇵 Japan', a:'Tokyo', d:['Kyoto','Osaka','Nagoya']},
+      {q:'Sea between Europe and Africa', a:'Mediterranean Sea', d:['Black Sea','Red Sea','Caspian Sea']},
+      {q:'Country landlocked in South Africa', a:'Lesotho', d:['Eswatini','Botswana','Namibia']},
+      {q:'Parthenon city', a:'Athens', d:['Rome','Istanbul','Thessaloniki']},
+      {q:'Country with capital 🇦🇺 Canberra', a:'Australia', d:['Austria','New Zealand','Fiji']},
+      {q:'Lake shared by 🇨🇦🇺🇸 at Niagara Falls', a:'Lake Erie', d:['Lake Ontario','Lake Huron','Lake Superior']},
+      {q:'Land of the Rising Sun', a:'Japan', d:['South Korea','China','Thailand']},
+      {q:'Capital of 🇪🇬 Egypt', a:'Cairo', d:['Alexandria','Giza','Luxor']}
+    ];
 
-  let state = load() || { decks:[sample], active:0, stats:{} };
-  if (!state.decks.length) state.decks=[sample];
-  const stats = state.stats;
+    // shuffle & pick first 10
+    function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]] } return a }
+    const quiz = shuffle(deck.slice()).slice(0,10);
 
-  // Spaced-ish memory per card id (front|back): {ease, lapses, strength}
-  function cid(c){return c.front+'|'+c.back}
-  function getS(c){return stats[cid(c)]||{ease:2.3,strength:0,lapses:0}}
-  function putS(c,s){stats[cid(c)]=s}
+    let idx=0, score=0, streak=0;
+    qtotalEl.textContent = quiz.length;
 
-  function save(){ localStorage.setItem(LS, JSON.stringify(state)); }
-  function load(){ try{ return JSON.parse(localStorage.getItem(LS)||''); }catch{ return null; } }
+    function render(){
+      const item = quiz[idx];
+      qEl.textContent = item.q;
+      qnumEl.textContent = (idx+1);
+      fbEl.textContent='';
+      nextBtn.disabled = true;
 
-  function decks(){ return state.decks }
-  function deck(){ return decks()[state.active] }
-
-  // ---- UI init ----
-  function syncDeckPicker(){
-    deckPick.innerHTML='';
-    decks().forEach((d,i)=>{
-      const o=document.createElement('option'); o.value=i; o.textContent=d.name+` (${d.cards.length})`; deckPick.appendChild(o);
-    });
-    deckPick.value=String(state.active);
-    deckNameMini.textContent=deck().name;
-  }
-
-  // ---- Game State ----
-  let queue = []; // array of card indexes (weighted)
-  let cur = null; // {i, card, opts:[], revealed:bool}
-  let level=+(state.level||1), xp=+(state.xp||0), xpNeed=+(state.xpNeed||50), streak=+(state.streak||0), lives=+(state.lives||3);
-
-  function refillQueue(){
-    queue.length=0;
-    const d=deck();
-    const N=d.cards.length;
-    if (!N) return;
-    d.cards.forEach((c,i)=>{
-      const s=getS(c);
-      const w = Math.max(1, 4 - Math.min(3, Math.floor(s.strength/2))) + (s.lapses>0?1:0);
-      for(let k=0;k<w;k++) queue.push(i);
-    });
-    shuffle(queue);
-    dueEl.textContent = queue.length;
-  }
-
-  function nextCard(){
-    if (queue.length===0) refillQueue();
-    const i = queue.shift();
-    if (i==null){ qEl.textContent='Add cards to start!'; mcEl.innerHTML=''; return; }
-    const c = deck().cards[i];
-    cur = {i, card:c, opts:[], revealed:false};
-    showQuestion(c);
-    dueEl.textContent = queue.length;
-  }
-
-  function showQuestion(c){
-    qEl.textContent=c.front;
-    aEl.hidden=true; aEl.textContent=c.back;
-    judge.hidden=true; mcEl.innerHTML='';
-
-    const mode = currentMode();
-    if (mode==='mc'){
-      const opts = [c.back];
-      const pool = deck().cards.filter(x=>x!==c).map(x=>x.back);
-      shuffle(pool);
-      while(opts.length<4 && pool.length) opts.push(pool.shift());
-      shuffle(opts);
-      cur.opts = opts;
-      opts.forEach((t,idx)=>{
-        const b=document.createElement('button'); b.className='opt'; b.innerHTML=`${idx+1}. ${escapeHtml(t)}`;
-        b.onclick=()=>answerMC(t);
-        mcEl.appendChild(b);
+      // build options
+      const options = shuffle([item.a, ...item.d]).slice(0,4);
+      optsEl.innerHTML = '';
+      options.forEach((text, i)=>{
+        const b=document.createElement('button');
+        b.className='opt';
+        b.textContent = `${'ABCD'[i]}. ${text}`;
+        b.onclick = ()=> select(b, text===item.a, item.a);
+        optsEl.appendChild(b);
       });
-    } else {
-      typeBox.hidden=false; typeInput.value=''; typeInput.focus();
-    }
-    updateProgress();
-  }
 
-  function answerMC(t){
-    if (!cur) return;
-    const correct = t.trim().toLowerCase() === cur.card.back.trim().toLowerCase();
-    Array.from(mcEl.children).forEach(btn=>{
-      const isC = btn.textContent.slice(3).trim().toLowerCase()===cur.card.back.trim().toLowerCase();
-      btn.classList.add(isC?'correct':'');
-      if (!isC && btn.textContent.includes(t)) btn.classList.add('wrong');
-      btn.disabled=true;
-    });
-    finish(correct);
-  }
-
-  function answerType(){
-    const t = typeInput.value||'';
-    const correct = t.trim().toLowerCase() === cur.card.back.trim().toLowerCase();
-    finish(correct);
-  }
-
-  function finish(correct){
-    const s = getS(cur.card);
-    if (correct){
-      streak++; xp += 10 + Math.min(30, streak*2);
-      s.strength = Math.min(10, s.strength+1); aEl.hidden=false; aEl.className='a right';
-      confetti('✨');
-    } else {
-      streak=0; lives = Math.max(0, lives-1);
-      s.lapses++; s.strength=Math.max(0,s.strength-1); aEl.hidden=false; aEl.className='a wrong';
-      document.getElementById('card').classList.add('blink'); setTimeout(()=>document.getElementById('card').classList.remove('blink'),200);
-      queue.splice(Math.floor(Math.random()*3),0,cur.i); // resurface soon
-      confetti('💥');
-    }
-    putS(cur.card,s);
-    updateHUD();
-
-    if (lives===0){
-      qEl.textContent = 'Game over — press Enter to retry';
-      mcEl.innerHTML=''; judge.hidden=true; aEl.hidden=false; aEl.textContent=`Final XP: ${xp}`;
-      saveRun();
-      return;
+      // progress bar
+      bar.style.width = `${(idx/quiz.length)*100}%`;
     }
 
-    judge.hidden=false;
-  }
+    function select(btn, isCorrect, correctText){
+      // lock
+      Array.from(optsEl.children).forEach(o=> o.disabled = true);
+      nextBtn.disabled = false;
 
-  function saveRun(){
-    Object.assign(state,{level,xp,xpNeed,streak:0,lives:3,stats});
-    save();
-  }
-
-  function updateHUD(){
-    levelUpLoop();
-    levelEl.textContent=level; xpEl.textContent=xp; xpNeedEl.textContent=xpNeed;
-    streakEl.textContent=streak; livesEl.textContent=lives;
-  }
-
-  function levelUpLoop(){
-    while (xp>=xpNeed){ xp-=xpNeed; level++; xpNeed=Math.floor(xpNeed*1.35+20); confetti('🏆'); }
-  }
-
-  function updateProgress(){
-    const total = deck().cards.length || 1;
-    const known = deck().cards.filter(c=>getS(c).strength>=5).length;
-    pbar.style.width = (100*known/total)+'%';
-  }
-
-  function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]] } return a }
-  function escapeHtml(s){ return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])) }
-
-  function currentMode(){ return document.querySelector('input[name="mode"]:checked').value }
-  function toggleType(){ typeBox.hidden = currentMode()!=='type' }
-
-  // --- Confetti (emoji) ---
-  function confetti(sym){
-    const n=14; const box=document.getElementById('card'); const r=box.getBoundingClientRect();
-    for(let i=0;i<n;i++){
-      const s=document.createElement('div'); s.textContent=sym; s.style.position='fixed'; s.style.left=(r.left+r.width/2)+'px'; s.style.top=(r.top+20)+'px'; s.style.pointerEvents='none'; s.style.zIndex=9; s.style.opacity=1; s.style.transition='transform 700ms ease-out, opacity 700ms ease-out'; s.style.transform=`translate(${(Math.random()*2-1)*160}px, ${-20 - Math.random()*120}px) rotate(${Math.random()*360}deg)`;
-      document.body.appendChild(s);
-      requestAnimationFrame(()=>{ s.style.transform=`translate(${(Math.random()*2-1)*260}px, ${220+Math.random()*180}px) rotate(${(Math.random()*720-360)}deg)`; s.style.opacity=0; });
-      setTimeout(()=>s.remove(),800);
+      if (isCorrect){
+        btn.classList.add('correct');
+        fbEl.textContent = 'Correct! ✅';
+        fbEl.className = 'feedback good';
+        score++; streak++;
+      } else {
+        btn.classList.add('wrong');
+        // also show which was correct
+        Array.from(optsEl.children).forEach(o=>{
+          if (o.textContent.endsWith(correctText)) o.classList.add('correct');
+        });
+        fbEl.textContent = `Incorrect. Correct answer: ${correctText}`;
+        fbEl.className = 'feedback bad';
+        streak = 0;
+      }
+      scoreEl.textContent = score; streakEl.textContent = streak;
     }
-  }
 
-  // ---- CRUD decks/cards ----
-  function addCard(front,back){ if(!front||!back) return; deck().cards.push({front,back}); save(); refillQueue(); updateProgress(); syncDeckPicker(); }
-  function importText(txt){
-    if(!txt.trim()) return;
-    let arr=[];
-    try {
-      if (txt.trim().startsWith('[')) arr = JSON.parse(txt);
-      else arr = txt.split(/\n+/).map(l=>l.split(',')).filter(x=>x[0]&&x[1]).map(x=>({front:x[0].trim(), back:x[1].trim()}));
-    } catch(e){ alert('Parse error. Use CSV: front,back or JSON list.'); return; }
-    deck().cards.push(...arr);
-    save(); refillQueue(); updateProgress(); syncDeckPicker();
-  }
-  function exportDeck(){ return JSON.stringify(deck().cards, null, 2) }
+    nextBtn.onclick = ()=>{
+      if (idx < quiz.length-1){ idx++; render(); }
+      else { finish(); }
+    };
 
-  // ---- Events ----
-  deckPick.onchange = () => { state.active=+deckPick.value; save(); refillQueue(); updateProgress(); nextCard(); };
-  document.querySelectorAll('input[name="mode"]').forEach(r=> r.onchange = ()=>{ toggleType(); nextCard(); });
-  submitType.onclick = ()=> answerType();
-  typeInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); answerType(); }});
-  gotIt.onclick = ()=>{ judge.hidden=true; nextCard(); };
-  oops.onclick = ()=>{ lives=Math.max(0,lives-1); updateHUD(); judge.hidden=true; nextCard(); };
-  addBtn.onclick = ()=>{ addCard(frontIn.value.trim(), backIn.value.trim()); frontIn.value=''; backIn.value=''; };
-  doImport.onclick = ()=> importText(importBox.value);
-  downloadBtn.onclick = ()=>{ const blob=new Blob([exportDeck()],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(deck().name.replace(/\W+/g,'_')||'deck')+'.json'; a.click(); URL.revokeObjectURL(a.href); };
-  addCardBtn.onclick = ()=> document.querySelectorAll('details')[1].open = true;
-  importBtn.onclick = ()=> document.querySelectorAll('details')[2].open = true;
-  exportBtn.onclick = ()=> downloadBtn.click();
-  resetStatsBtn.onclick = ()=>{ if(confirm('Reset XP/streak/lives and per-card memory?')){ state.stats={}; level=1; xp=0; xpNeed=50; streak=0; lives=3; saveRun(); updateHUD(); updateProgress(); alert('Stats reset'); } };
-  helpBtn.onclick = ()=> alert('Quick start: pick a deck, answer with 1-4 or type, build streaks for XP, avoid losing all 3 lives. Add/import your own cards. Data saves locally.');
+    restartBtn.onclick = ()=> location.reload();
 
-  document.addEventListener('keydown', e=>{
-    const mode=currentMode();
-    if(['Digit1','Digit2','Digit3','Digit4'].includes(e.code) && mode==='mc' && mcEl.children.length){
-      const n=e.code.slice(-1)-1; if(mcEl.children[n]) mcEl.children[n].click();
-    } else if(e.key==='Enter'){
-      if (judge.hidden) { if(mode==='type'){ answerType(); } else { /* noop */ } }
-      else { gotIt.click(); }
-    } else if(e.code==='Space'){ e.preventDefault(); if(!judge.hidden) gotIt.click(); }
-  });
+    function finish(){
+      qEl.textContent = `Done! You scored ${score}/${quiz.length}.`;
+      optsEl.innerHTML = '';
+      fbEl.textContent = streak>0 ? `Final streak: ${streak}` : '';
+      nextBtn.disabled = true;
+      bar.style.width = '100%';
+    }
 
-  // ---- Boot ----
-  syncDeckPicker(); refillQueue(); updateHUD(); updateProgress(); nextCard(); toggleType();
-})();
-</script>
+    // boot
+    render();
+  })();
+  </script>
 </body>
 </html>
+
